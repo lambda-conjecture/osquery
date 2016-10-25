@@ -71,6 +71,11 @@ FLAG(string,
      "hostname",
      "Field used to identify the host running osquery (hostname, uuid)");
 
+CLI_FLAG(string,
+	 use_host_name,
+	 "",
+	 "Override the OS hostname with this name");
+
 FLAG(bool, utc, true, "Convert all UNIX times to UTC");
 
 #ifdef WIN32
@@ -95,10 +100,14 @@ std::string getHostname() {
   char* hostname = (char*)malloc(size);
   std::string hostname_string;
   if (hostname != nullptr) {
-    memset((void*)hostname, 0, size);
-    gethostname(hostname, size - 1);
-    hostname_string = std::string(hostname);
-    free(hostname);
+    if (FLAGS_use_host_name == "") {
+      memset((void*)hostname, 0, size);
+      gethostname(hostname, size - 1);
+      hostname_string = std::string(hostname);
+      free(hostname);
+    } else {
+      hostname_string = FLAGS_use_host_name;
+    }
   }
 
   boost::algorithm::trim(hostname_string);
