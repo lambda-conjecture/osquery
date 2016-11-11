@@ -18,6 +18,7 @@
 #include <rocksdb/env.h>
 #include <rocksdb/options.h>
 
+#include <glog/raw_logging.h>
 #include <osquery/database.h>
 #include <osquery/filesystem.h>
 #include <osquery/logger.h>
@@ -117,8 +118,8 @@ REGISTER_INTERNAL(RocksDBDatabasePlugin, "database", "rocksdb");
 void GlogRocksDBLogger::Logv(const char* format, va_list ap) {
   // Convert RocksDB log to string and check if header or level-ed log.
   std::string log_line;
+  char buffer[501] = {0};
   {
-    char buffer[501] = {0};
     vsnprintf(buffer, 500, format, ap);
     va_end(ap);
     if (buffer[0] != '[' || (buffer[1] != 'E' && buffer[1] != 'W')) {
@@ -130,7 +131,7 @@ void GlogRocksDBLogger::Logv(const char* format, va_list ap) {
 
   // There is a spurious warning on first open.
   if (log_line.find("Error when reading") == std::string::npos) {
-    LOG(INFO) << "RocksDB: " << log_line;
+    RAW_LOG_INFO("%s%s", "RocksDB: ", buffer);
   }
 }
 
