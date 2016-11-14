@@ -18,10 +18,10 @@
 #include <rocksdb/env.h>
 #include <rocksdb/options.h>
 
-#include <glog/raw_logging.h>
 #include <osquery/database.h>
 #include <osquery/filesystem.h>
 #include <osquery/logger.h>
+#include <glog/raw_logging.h>
 
 #include "osquery/filesystem/fileops.h"
 

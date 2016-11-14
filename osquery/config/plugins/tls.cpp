@@ -83,6 +83,26 @@ Status TLSConfigPlugin::setUp() {
   return Status(0, "OK");
 }
 
+void debugPrintFIMConfig(std::string json) {
+  try {
+    pt::ptree tree;
+    std::stringstream input;
+    input << json;
+    pt::read_json(input, tree);
+
+    auto treeFIM = tree.get_child("file_paths");
+    for (const pt::ptree::value_type& group : treeFIM) {
+      std::string name = group.first;
+      LOG(INFO) << "TLSConfig FILE_GROUP: [" << name << "]\n";
+      for (const pt::ptree::value_type& path : group.second) {
+	LOG(INFO) << "  Path: [" << path.second.data() << "]\n";
+      }
+    }
+  } catch(std::exception& e) {
+
+  }
+}
+
 Status TLSConfigPlugin::genConfig(std::map<std::string, std::string>& config) {
   std::string json;
 
@@ -97,6 +117,8 @@ Status TLSConfigPlugin::genConfig(std::map<std::string, std::string>& config) {
   if (!s.ok()) {
     return s;
   }
+
+  debugPrintFIMConfig( json );
 
   if (FLAGS_tls_node_api) {
     // The node API embeds configuration data (JSON escaped).
